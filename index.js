@@ -19,7 +19,6 @@ class Tree {
 
         // Sort the array for a balanced BST
         const sortedArray = [...new Set(dataArray)].sort((a, b) => a - b);
-        console.log(sortedArray);
 
         return this.buildTreeRecursive(sortedArray, 0, sortedArray.length - 1);
     };
@@ -51,16 +50,6 @@ class Tree {
         };
     };
 
-    preOrder(node = this.root) {
-        if (node == null)
-        {
-            return;
-        }
-        console.log(node.data + " ");
-        preOrder(node.left);
-        preOrder(node.right);
-    };
-
     // Helper function to call insertNode
     insert(value) {
         this.insertNode(this.root, value);
@@ -89,7 +78,7 @@ class Tree {
         // Base case: there are no node so keep moving.
         if (node === null) {
             return node;
-        }
+        };
    
         // Recursive calls for ancestors of
         // node to be deleted
@@ -99,7 +88,7 @@ class Tree {
         } else if (node.value < value) {
             node.right = this.deleteNode(node.right, value);
             return node;
-        }
+        };
     
         // We reach here when node is the node
         // to be deleted.
@@ -124,7 +113,7 @@ class Tree {
             while (succ.left !== null) {
                 succParent = succ;
                 succ = succ.left;
-            }
+            };
         
             // Delete successor.  Since successor
             // is always left child of its parent
@@ -136,7 +125,7 @@ class Tree {
                 succParent.left = succ.right;
             } else {
                 succParent.right = succ.right;
-            }
+            };
         
             // Copy Successor Data to node
             node.value = succ.value;
@@ -145,11 +134,129 @@ class Tree {
             delete this.succ;
             return node;
         };
-  };
+    };
+
+    // Return the node with the given value.
+    find(node, value) {
+        // Base case: there are no such node.
+        if (node === null) {
+            return node;
+        };
+    
+        // Recursive calls to find the node
+        if (node.value > value) {
+            node.left = this.find(node.left, value);
+            return node;
+        } else if (node.value < value) {
+            node.right = this.find(node.right, value);
+            return node;
+        };
+
+        console.log(node);
+        return node;
+    };
+
+    // Traverse the tree in breadth-first level order and 
+    // provide each node as an argument to the callback
+    levelOrder(callback) {
+        // Check if the tree has a root
+        if (!this.root) {
+            return;
+        };
+
+        // Initialize a queue with the root node
+        const queue = [this.root];
+
+        // Continue while there are nodes in the queue
+        while (queue.length > 0) {
+            // Dequeue the front node from the queue
+            const currentNode = queue.shift();
+
+            // Call the callback on the current node
+            if (callback) {
+                callback(currentNode);
+            };
+
+            // Enqueue left child if exists
+            if (currentNode.left) {
+                queue.push(currentNode.left);
+            };
+
+            // Enqueue right child if exists
+            if (currentNode.right) {
+                queue.push(currentNode.right);
+            };
+        };
+    };
+
+    // Print inOrder traversal
+    inOrder(node) {
+        if (node === null) {
+            return;
+        };
+         
+        // First recur on left subtree
+        this.inOrder(node.left);
+         
+        // Now deal with the node
+        console.log(node.value);
+         
+        // Then recur on right subtree
+        this.inOrder(node.right);
+    };
+
+    // Print preOrder traversal
+    preOrder(node) {
+        if (node == null) {
+            return;
+        };
+
+        console.log(node.value);
+        this.preOrder(node.left);
+        this.preOrder(node.right);
+    };
+
+    // Print postOrder traversal
+    postOrder(node) {
+        if (node === null) {
+            return;
+        };
+
+        this.postOrder(node.left);
+        this.postOrder(node.right);
+        console.log(node.value);
+    };
+
+    // Return max height of the tree
+    height(node) {
+        if (node == null)
+            return -1;
+        else {
+            // Compute height of each subtree
+            let lheight = this.height(node.left);
+            let rheight = this.height(node.right);
+ 
+            // Use the larger one
+            if (lheight > rheight) {
+                return (lheight + 1);
+            } else {
+                return (rheight + 1);
+            }
+        };
+    };
+
+    depth(node) {
+
+    };
 };
 
 const data = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const binaryTree = new Tree(data);
+
+// Define a callback function to perform an operation on each node
+const optionalCallback = (node) => {
+    console.log(node.value);
+};
 
 console.log("Tree by the Default");
 binaryTree.prettyPrint();
@@ -161,3 +268,20 @@ binaryTree.prettyPrint();
 console.log("Tree after removing Value");
 binaryTree.deleteNode(binaryTree.root, 67);
 binaryTree.prettyPrint();
+
+console.log("Output for the: find(root, 111)");
+binaryTree.find(binaryTree.root, 111);
+
+console.log("Output for the: levelOrder(optionalCallback)");
+binaryTree.levelOrder(optionalCallback);
+
+console.log("Output for the: inOrder(root)");
+binaryTree.inOrder(binaryTree.root);
+
+console.log("Output for the: preOrder(root)");
+binaryTree.preOrder(binaryTree.root);
+
+console.log("Output for the: postOrder(root)");
+binaryTree.postOrder(binaryTree.root);
+
+console.log("Max height output: " + binaryTree.height(binaryTree.root));
