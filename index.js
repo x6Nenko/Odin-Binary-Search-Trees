@@ -127,7 +127,7 @@ class Tree {
                 succParent.right = succ.right;
             };
         
-            // Copy Successor Data to node
+            // Copy Successor Value to node
             node.value = succ.value;
         
             // Delete Successor and return node
@@ -167,6 +167,9 @@ class Tree {
         // Initialize a queue with the root node
         const queue = [this.root];
 
+        // If no callback push values into array
+        const values = [];
+
         // Continue while there are nodes in the queue
         while (queue.length > 0) {
             // Dequeue the front node from the queue
@@ -175,6 +178,8 @@ class Tree {
             // Call the callback on the current node
             if (callback) {
                 callback(currentNode);
+            } else {
+                values.push(currentNode.value);
             };
 
             // Enqueue left child if exists
@@ -187,44 +192,71 @@ class Tree {
                 queue.push(currentNode.right);
             };
         };
+
+        // If no callback return array
+        if (!callback) return values;
     };
 
     // Print inOrder traversal
     inOrder(node) {
-        if (node === null) {
-            return;
+        const values = [];
+
+        function traverse(node) {
+            if (node === null) {
+                return;
+            };
+             
+            // First recur on left subtree
+            traverse(node.left);
+             
+            // Now deal with the node
+            values.push(node.value);
+             
+            // Then recur on right subtree
+            traverse(node.right);
         };
-         
-        // First recur on left subtree
-        this.inOrder(node.left);
-         
-        // Now deal with the node
-        console.log(node.value);
-         
-        // Then recur on right subtree
-        this.inOrder(node.right);
+
+        traverse(node);
+
+        return values;
     };
 
     // Print preOrder traversal
     preOrder(node) {
-        if (node == null) {
-            return;
+        const values = [];
+
+        function traverse(node) {
+            if (node == null) {
+                return;
+            };
+    
+            values.push(node.value);
+            traverse(node.left);
+            traverse(node.right);
         };
 
-        console.log(node.value);
-        this.preOrder(node.left);
-        this.preOrder(node.right);
+        traverse(node);
+
+        return values;
     };
 
     // Print postOrder traversal
     postOrder(node) {
-        if (node === null) {
-            return;
+        const values = [];
+
+        function traverse(node) {
+            if (node === null) {
+                return;
+            };
+    
+            traverse(node.left);
+            traverse(node.right);
+            values.push(node.value);
         };
 
-        this.postOrder(node.left);
-        this.postOrder(node.right);
-        console.log(node.value);
+        traverse(node);
+
+        return values;
     };
 
     // Return max height of the tree
@@ -241,12 +273,54 @@ class Tree {
                 return (lheight + 1);
             } else {
                 return (rheight + 1);
-            }
+            };
         };
     };
 
+    // Return max depth of the tree
     depth(node) {
+        if (node == null)
+            return -1;
+        else {
+            /* compute the depth of each subtree */
+            let lDepth = this.depth(node.left);
+            let rDepth = this.depth(node.right);
+   
+            /* use the larger one */
+            if (lDepth > rDepth)
+                return (lDepth + 1);
+             else
+                return (rDepth + 1);
+        };
+    };
 
+    // Check if the tree is balanced
+    isBalanced(node) {
+        if (node === null) return 0;
+
+        const left = this.height(node.left);
+        const right = this.height(node.right);
+
+        if (
+            // if a previous call return false,
+            // we need to pass false all the way up
+            left === false ||
+            right === false ||
+            Math.abs(left - right) > 1
+        ) {
+            return false;
+        }
+
+        // height of a node
+        return Math.max(left, right) + 1;
+    };
+
+    // Rebalance an unbalanced tree
+    rebalance(node) {
+        const values = [...this.inOrder(node)];
+
+        // Build a new balanced tree using the sorted values
+        this.root = this.buildTree(values);
     };
 };
 
@@ -272,16 +346,34 @@ binaryTree.prettyPrint();
 console.log("Output for the: find(root, 111)");
 binaryTree.find(binaryTree.root, 111);
 
-console.log("Output for the: levelOrder(optionalCallback)");
-binaryTree.levelOrder(optionalCallback);
+console.log("Output for the: levelOrder()");
+console.log(binaryTree.levelOrder());
 
 console.log("Output for the: inOrder(root)");
-binaryTree.inOrder(binaryTree.root);
+console.log(binaryTree.inOrder(binaryTree.root));
 
 console.log("Output for the: preOrder(root)");
-binaryTree.preOrder(binaryTree.root);
+console.log(binaryTree.preOrder(binaryTree.root));
 
 console.log("Output for the: postOrder(root)");
-binaryTree.postOrder(binaryTree.root);
+console.log(binaryTree.postOrder(binaryTree.root));
 
 console.log("Max height output: " + binaryTree.height(binaryTree.root));
+
+console.log("Max depth output: " + binaryTree.depth(binaryTree.root));
+
+console.log("isBalanced output (returns node height if its balanced): " + binaryTree.isBalanced(binaryTree.root));
+
+console.log("Unbalance the Tree");
+binaryTree.insert(10000);
+binaryTree.insert(11000);
+binaryTree.insert(12000);
+binaryTree.prettyPrint();
+
+console.log("isBalanced output (returns node height if its balanced): " + binaryTree.isBalanced(binaryTree.root));
+
+console.log("Rebalanced Tree");
+binaryTree.rebalance(binaryTree.root);
+binaryTree.prettyPrint();
+
+console.log("isBalanced output (returns node height if its balanced): " + binaryTree.isBalanced(binaryTree.root));
